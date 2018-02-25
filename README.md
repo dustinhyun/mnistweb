@@ -5,4 +5,4 @@ Interactive web page to test your MNIST model running on TFS.
 
 2. $ ./mnist_server.py <TFS_IP_OR_HOST>:<TFS_PORT> <PORT>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/EVQ8BmZpLyQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+[![Video Label](http://img.youtube.com/vi/EVQ8BmZpLyQ/0.jpg)](https://youtu.be/EVQ8BmZpLyQ?t=0s)
