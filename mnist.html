@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>Test your MNIST model on the web</title>
+</head>
+<style>
+.title {
+	text-align: center; font-size: 40px; font-weight: bold; margin: 20px auto;
+}
+.wrapper {
+	overflow: hidden; margin: 0 auto; width: 916px;
+}
+.inputArea {
+	cursor: pointer; height: 448px; float: left; margin-bottom: 20px; overflow: hidden; unselectable: on; user-select: none; width: 448px;
+}
+.inputArea > div {
+	background-color: #ccc; box-sizing: border-box; height: 14px; float:left; font-size: 6px; margin: 1px; padding: 1px 0px 0px 3px; width: 14px;
+}
+.inputArea > div.set {
+	background-color: black; color: white;
+}
+.predArea {
+	box-sizing: border-box; height: 448px; float: left; font-size: 140px; overflow: hidden; padding-top: 150px; text-align: center; width: 448px;
+}
+.clearBtn {
+	background-color: gray; box-sizing: border-box; border-radius: 14px; color: white; cursor: pointer; height: 80px; margin: auto; font-size: 20px; padding: 30px 0px 4px; text-align: center; width: 200px;
+}
+.clearBtn:hover {
+	color: black;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<body>
+
+<div class="title">Test your MNIST model on the web</div>
+
+<div class="wrapper">
+	<div class="inputArea"></div> <div class="predArea">?</div>
+</div>
+
+<div class="clearBtn" onclick="clearInput();">Clear</div>
+
+<script>
+
+var gIsWriting = false;
+function initInputArea() {
+	$(".inputArea").mousedown(function() {
+		gIsWriting = true;
+	});
+	$("body").mouseup(function() {
+		gIsWriting = false;
+        inference(serializeInput());
+	});
+}
+
+var gSensors = [];
+function initInput() {
+
+	var size = 28 * 28;
+
+	for (var i = 0; i < size; ++i) {
+
+		var div = $("<div>").text("0").attr("id", "index" + i);
+
+		div.mouseover(function() {
+
+			if (!gIsWriting) {
+				return;
+			}
+
+			$(this).text("1").addClass("set");
+            markingNeighbors($(this).attr("id"));
+		});
+        gSensors.push(div);
+		$(".inputArea").append(div);
+	}
+}
+
+// To make your writing bold.
+function markingNeighbors(index) {
+
+    var idString = index.split("index")[1];
+    var id = parseInt(idString);
+
+    // Left
+    if (id % 28 > 0) {
+        $("#index" + (id - 1)).text(1).addClass("set");
+    }
+    // Right
+    if (id % 28 < 27) {
+        $("#index" + (id + 1)).text(1).addClass("set");
+    }
+    // Top
+    if (id > 27) {
+        $("#index" + (id - 28)).text(1).addClass("set");
+    }
+    // Bottom
+    if (id < 28 * 28 - 28) {
+        $("#index" + (id + 28)).text(1).addClass("set");
+    }
+}
+
+function clearInput() {
+	$.each($(".inputArea > div"), function(i, item) {
+		$(item).text("0").removeClass("set");
+	});
+}
+
+function serializeInput() {
+    var xList = [];
+
+    $.each($(".inputArea > div"), function(i, item) {
+        if ($(item).text() == "1") {
+            xList.push(1);
+        }
+        else {
+            xList.push(0);
+        }
+    });
+
+    return xList.join(",");
+}
+
+function inference(data) {
+
+    $.ajax({
+        url: "/inference",
+        cached: false,
+        method: "POST",
+        data: { x: data },
+        success: function(res) {
+            $(".predArea").text(res);
+        },
+        error: function(x, s, e) {
+            $(".predArea").text("e");
+        }
+    });
+}
+
+$(document).ready(function() {
+	initInputArea();
+	initInput();
+});
+</script>
+</body>
+</html>
