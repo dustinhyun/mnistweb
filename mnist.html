@@ -110,18 +110,18 @@ function clearInput() {
 }
 
 function serializeInput() {
-    var xList = [];
+    var inputData = [];
 
     $.each($(".inputArea > div"), function(i, item) {
         if ($(item).text() == "1") {
-            xList.push(1);
+            inputData.push(1);
         }
         else {
-            xList.push(0);
+            inputData.push(0);
         }
     });
 
-    return xList.join(",");
+    return inputData.join(",");
 }
 
 function inference(data) {
